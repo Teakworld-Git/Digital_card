@@ -205,14 +205,20 @@ const vcard=["BEGIN:VCARD","VERSION:3.0","N:Shaad;Mahamod;;;","FN:Mahamod Shaad"
 async function saveContact(){
   const blob = new Blob([vcard], {type:"text/vcard;charset=utf-8"});
   const file = new File([blob], "Mahamod_Shaad.vcf", {type:"text/vcard"});
-  // Try Web Share API first (Android native flow — opens contacts app directly)
-  if(navigator.share && navigator.canShare && navigator.canShare({files:[file]})){
+  // Try Web Share API with files
+  if(navigator.share){
     try {
       await navigator.share({files:[file], title:"Mahamod Shaad", text:"IT Manager · Teakworld"});
       return;
-    } catch(e){ /* user cancelled or failed, fall through */ }
+    } catch(e){
+      // If file share failed, try sharing just the vcard text
+      try {
+        await navigator.share({title:"Mahamod Shaad", text: vcard});
+        return;
+      } catch(e2){ /* fall through to download */ }
+    }
   }
-  // Fallback: direct download (iOS / desktop)
+  // Final fallback: download
   const u = URL.createObjectURL(blob);
   const a = document.createElement("a");
   a.href = u; a.download = "Mahamod_Shaad.vcf";
