@@ -203,22 +203,32 @@ body::before{content:"";position:fixed;inset:0;z-index:0;background:radial-gradi
 <script>
 const vcard=["BEGIN:VCARD","VERSION:3.0","N:Shaad;Mahamod;;;","FN:Mahamod Shaad","ORG:Teakworld","TITLE:IT Manager","TEL;TYPE=CELL,VOICE:+23052503105","TEL;TYPE=WORK,VOICE:86900","EMAIL;TYPE=WORK:shaad@teakworld.mu","URL:https://www.linkedin.com/in/shaad-mahamod-88067675","ADR;TYPE=WORK:;;Bagatelle Mall;Mauritius;;;MU","NOTE:Teakworld - Where quality meets comfort","END:VCARD"].join("\r\n");
 async function saveContact(){
-  const blob = new Blob([vcard], {type:"text/vcard;charset=utf-8"});
-  const file = new File([blob], "Mahamod_Shaad.vcf", {type:"text/vcard"});
-  // Try Web Share API with files
-  if(navigator.share){
-    try {
-      await navigator.share({files:[file], title:"Mahamod Shaad", text:"IT Manager · Teakworld"});
-      return;
-    } catch(e){
-      // If file share failed, try sharing just the vcard text
-      try {
-        await navigator.share({title:"Mahamod Shaad", text: vcard});
-        return;
-      } catch(e2){ /* fall through to download */ }
-    }
+  const isAndroid = /android/i.test(navigator.userAgent);
+  const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
+
+  // ANDROID — Intent URL opens Contacts app directly, fields pre-filled
+  if(isAndroid){
+    const intent = [
+      'intent:#Intent',
+      'action=android.intent.action.INSERT',
+      'type=vnd.android.cursor.dir/contact',
+      'S.name=Mahamod Shaad',
+      'S.company=Teakworld',
+      'S.jobTitle=IT Manager',
+      'S.phone=%2B23052503105',
+      'S.phone_type=2',
+      'S.secondary_phone=86900',
+      'S.secondary_phone_type=3',
+      'S.email=shaad%40teakworld.mu',
+      'S.email_type=1',
+      'end'
+    ].join(';');
+    window.location.href = intent;
+    return;
   }
-  // Final fallback: download
+
+  // iOS — download vcf, iOS auto-prompts to import
+  const blob = new Blob([vcard], {type:"text/vcard;charset=utf-8"});
   const u = URL.createObjectURL(blob);
   const a = document.createElement("a");
   a.href = u; a.download = "Mahamod_Shaad.vcf";
