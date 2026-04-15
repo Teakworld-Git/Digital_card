@@ -259,5 +259,32 @@ document.addEventListener('copy', e=>e.preventDefault());
 })();
 </script>
 <script>document.addEventListener('contextmenu',e=>e.preventDefault());document.addEventListener('keydown',e=>{if(e.ctrlKey&&(e.key==='u'||e.key==='U'||e.key==='s'||e.key==='S')){e.preventDefault();}if(e.key==='F12'){e.preventDefault();}if(e.ctrlKey&&e.shiftKey&&(e.key==='I'||e.key==='J'||e.key==='C')){e.preventDefault();}});</script>
+<script>
+(function(){
+  // Disable right click
+  document.addEventListener('contextmenu', e => e.preventDefault());
+  // Disable keyboard shortcuts
+  document.addEventListener('keydown', e => {
+    if(e.ctrlKey && ['u','U','s','S','a','A','p','P'].includes(e.key)) e.preventDefault();
+    if(e.key === 'F12') e.preventDefault();
+    if(e.ctrlKey && e.shiftKey && ['i','I','j','J','c','C','k','K'].includes(e.key)) e.preventDefault();
+  });
+  // Disable select & copy
+  document.addEventListener('selectstart', e => e.preventDefault());
+  document.addEventListener('copy', e => e.preventDefault());
+  document.addEventListener('cut', e => e.preventDefault());
+  // Disable drag
+  document.addEventListener('dragstart', e => e.preventDefault());
+  // Devtools detection — blank page if opened
+  const dt = ()=>{
+    if(window.outerWidth - window.innerWidth > 160 || window.outerHeight - window.innerHeight > 160){
+      document.body.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100vh;font-family:sans-serif;color:#ccc;font-size:14px;">Access denied</div>';
+    }
+  };
+  setInterval(dt, 800);
+  // Disable print
+  window.addEventListener('beforeprint', e => { e.preventDefault(); window.stop(); });
+})();
+</script>
 </body>
 </html>
